@@ -23,8 +23,8 @@ type model struct {
 func initialModel() model {
 	return model{
 		panes: []pane{
-			{idx: 0, content: "Pane 0\nThis is the first pane\nLine 3\nLine 4\nLine 5"},
-			{idx: 1, content: "Pane 1\nThis is the second pane\nLine 3\nLine 4\nLine 5"},
+			{idx: 0, content: "Pane 0"},
+			{idx: 1, content: "Pane 1"},
 		},
 		activePane: 0,
 	}
@@ -52,8 +52,8 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		// 縦に分割: 各ペインの高さ = 全体の高さ / ペイン数
 		h := msg.Height / len(m.panes)
 		for i := range m.panes {
-			// ボーダー分を引く（上下で2行）
-			m.panes[i].viewport = viewport.New(msg.Width-4, h-3)
+			// ボーダー分引く
+			m.panes[i].viewport = viewport.New(msg.Width-2, h-2)
 			m.panes[i].viewport.SetContent(m.panes[i].content)
 		}
 	}
@@ -65,17 +65,14 @@ func (m model) View() string {
 	for i, p := range m.panes {
 		// アクティブなペインは二重線
 		border := lipgloss.NormalBorder()
-		borderColor := lipgloss.Color("240")
 		if i == m.activePane {
 			border = lipgloss.DoubleBorder()
-			borderColor = lipgloss.Color("63")
 		}
 
 		style := lipgloss.NewStyle().
 			Border(border).
-			BorderForeground(borderColor).
-			Width(p.viewport.Width + 2).
-			Height(p.viewport.Height + 2)
+			Width(p.viewport.Width).
+			Height(p.viewport.Height)
 
 		views = append(views, style.Render(p.viewport.View()))
 	}
@@ -84,7 +81,7 @@ func (m model) View() string {
 }
 
 func main() {
-	p := tea.NewProgram(initialModel(), tea.WithAltScreen())
+	p := tea.NewProgram(initialModel())
 	if _, err := p.Run(); err != nil {
 		fmt.Println(err)
 		os.Exit(1)
