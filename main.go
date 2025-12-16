@@ -18,7 +18,6 @@ type pane struct {
 type model struct {
 	panes      []pane
 	activePane int
-	ready      bool
 }
 
 func initialModel() model {
@@ -28,7 +27,6 @@ func initialModel() model {
 			{idx: 1, content: "Pane 1\nThis is the second pane\nLine 3\nLine 4\nLine 5"},
 		},
 		activePane: 0,
-		ready:      false,
 	}
 }
 
@@ -48,7 +46,6 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 		}
 	case tea.WindowSizeMsg:
-		m.ready = true
 		if len(m.panes) == 0 {
 			return m, nil
 		}
@@ -64,10 +61,6 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m model) View() string {
-	if !m.ready {
-		return "Initializing..."
-	}
-
 	views := []string{}
 	for i, p := range m.panes {
 		// アクティブなペインは二重線
